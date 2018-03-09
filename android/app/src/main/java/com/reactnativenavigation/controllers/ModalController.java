@@ -2,7 +2,9 @@ package com.reactnativenavigation.controllers;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
 import android.view.Window;
+import android.view.WindowManager;
 
 import com.facebook.react.bridge.Callback;
 import com.facebook.react.bridge.Promise;
@@ -37,9 +39,15 @@ class ModalController implements ScreenStackContainer, Modal.OnModalDismissedLis
     }
 
     void showModal(ScreenParams screenParams) {
-        Modal modal = new Modal(activity, this, screenParams);
-        modal.show();
-        stack.add(modal);
+      Modal modal = new Modal(activity, this, screenParams);
+
+      // Hack to keep immersive mode when showing the dialog http://vardhan-justlikethat.blogspot.com.uy/2014/06/android-immersive-mode-for-dialog.html
+      modal.getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE, WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE);
+      modal.getWindow().getDecorView().setSystemUiVisibility(activity.getWindow().getDecorView().getSystemUiVisibility());
+      modal.show();
+      modal.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE);
+
+      stack.add(modal);
     }
 
     void dismissTopModal(ScreenParams params) {
